@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Watch Episode — Asianet</title>
+    <meta name="description" content="Watch Asianet serial episode on Invidious">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/style.css">
+</head>
+
+<body>
+    <div class="bg-glow"></div>
+    <div class="bg-glow-2"></div>
+
+    <header class="header">
+        <div class="header-inner">
+            <a href="/" class="logo">
+                <div class="logo-icon">A</div>
+                <div class="logo-text"><span>Asianet</span> Episodes</div>
+            </a>
+            <div class="header-badge">Now Playing</div>
+        </div>
+    </header>
+
+    <div class="watch-container" id="watch-app">
+        <div class="loader">
+            <div class="spinner"></div>
+            <div class="loader-text">Loading episode details…</div>
+        </div>
+    </div>
+
+    <script>
+        const PLAY_SVG = '<svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg>';
+        const BACK_SVG = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>';
+        const EXTERNAL_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>';
+
+        const INVIDIOUS_BASE = 'https://yewtu.be';
+
+        function getVideoId() {
+            const parts = window.location.pathname.split('/');
+            return parts[parts.length - 1];
+        }
+
+        function formatDate(isoDate) {
+            const d = new Date(isoDate);
+            return d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+        }
+
+        async function loadWatchPage() {
+            const app = document.getElementById('watch-app');
+            const videoId = getVideoId();
+
+            if (!videoId) {
+                app.innerHTML = `
+          <a href="/" class="back-btn">${BACK_SVG} Back to Episodes</a>
+          <div class="error-state"><h2>Invalid video</h2><p>No video ID found.</p></div>`;
+                return;
+            }
+
+            const watchUrl = `${INVIDIOUS_BASE}/watch?v=${videoId}`;
+
+            try {
+                const res = await fetch('/api/episodes');
+                const data = await res.json();
+
+                let episode = null;
+                for (const serial of data.serials) {
+                    const found = serial.episodes.find(ep => ep.videoId === videoId);
+                    if (found) { episode = found; break; }
+                }
+
+                if (episode) {
+                    document.title = episode.title + ' — Asianet';
+                    app.innerHTML = `
+            <a href="/" class="back-btn">${BACK_SVG} Back to Episodes</a>
+            <div class="watch-card">
+              <div class="watch-thumb-wrapper">
+                <img class="watch-thumb" src="${episode.thumbnail}" alt="${episode.title}">
+                <div class="watch-thumb-overlay">
+                  <a href="${watchUrl}" class="play-btn-large" title="Watch on Yewtu.be">${PLAY_SVG}</a>
+                </div>
+              </div>
+              <div class="watch-body">
+                <h1 class="watch-title">${episode.title}</h1>
+                <div class="watch-meta">
+                  <span class="tag tag-serial">${episode.serialName}</span>
+                  <span class="tag tag-episode">Episode ${episode.episodeNumber}</span>
+                  <span class="tag tag-date">${formatDate(episode.published)}</span>
+                </div>
+                ${episode.description ? '<div class="watch-description">' + episode.description.replace(/\n/g, '<br>') + '</div>' : ''}
+                <a href="${watchUrl}" class="watch-cta">${EXTERNAL_SVG} Watch on Yewtu.be</a>
+              </div>
+            </div>`;
+                } else {
+                    const thumbnail = 'https://i.ytimg.com/vi/' + videoId + '/hqdefault.jpg';
+                    app.innerHTML = `
+            <a href="/" class="back-btn">${BACK_SVG} Back to Episodes</a>
+            <div class="watch-card">
+              <div class="watch-thumb-wrapper">
+                <img class="watch-thumb" src="${thumbnail}" alt="Video thumbnail">
+                <div class="watch-thumb-overlay">
+                  <a href="${watchUrl}" class="play-btn-large" title="Watch on Yewtu.be">${PLAY_SVG}</a>
+                </div>
+              </div>
+              <div class="watch-body">
+                <h1 class="watch-title">Asianet Episode</h1>
+                <a href="${watchUrl}" class="watch-cta">${EXTERNAL_SVG} Watch on Yewtu.be</a>
+              </div>
+            </div>`;
+                }
+            } catch (err) {
+                console.error(err);
+                const thumbnail = 'https://i.ytimg.com/vi/' + videoId + '/hqdefault.jpg';
+                app.innerHTML = `
+          <a href="/" class="back-btn">${BACK_SVG} Back to Episodes</a>
+          <div class="watch-card">
+            <div class="watch-thumb-wrapper">
+              <img class="watch-thumb" src="${thumbnail}" alt="Video thumbnail">
+              <div class="watch-thumb-overlay">
+                <a href="${watchUrl}" class="play-btn-large" title="Watch on Yewtu.be">${PLAY_SVG}</a>
+              </div>
+            </div>
+            <div class="watch-body">
+              <h1 class="watch-title">Watch Episode</h1>
+              <a href="${watchUrl}" class="watch-cta">${EXTERNAL_SVG} Watch on Yewtu.be</a>
+            </div>
+          </div>`;
+            }
+        }
+
+        loadWatchPage();
+    </script>
+</body>
+
+</html>

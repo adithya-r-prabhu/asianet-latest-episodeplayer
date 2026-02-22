@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Asianet Episodes - Latest Videos</title>
+    <!-- Use Google Fonts (Inter and Outfit) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@500;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div class="background-elements">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+    </div>
+
+    <div class="app-container">
+        <header class="app-header">
+            <h1 class="logo">Asianet <span>Episodes</span></h1>
+            <div class="view-toggles">
+                <button id="btn-latest" class="toggle-btn active">Latest Episodes</button>
+                <button id="btn-sequence" class="toggle-btn">Watch in Order</button>
+            </div>
+        </header>
+
+        <main class="content-area">
+            <div class="status-message" id="status-message">Loading episodes...</div>
+            <div class="episodes-grid" id="episodes-grid">
+                <!-- Video cards go here -->
+            </div>
+        </main>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+
+</html>
