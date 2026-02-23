@@ -35,7 +35,7 @@ module.exports = async function handler(req, res) {
         }
 
         const episodes = entries
-            .filter(entry => entry.title && entry.title.toLowerCase().includes('episode'))
+            .filter(entry => entry.title && entry.title.toLowerCase().includes('episode') && !entry.title.toLowerCase().includes('promo'))
             .map(entry => {
                 let thumbnail = '';
                 if (entry['media:group'] && entry['media:group']['media:thumbnail']) {

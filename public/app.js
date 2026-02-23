@@ -1,11 +1,10 @@
 document.addEventListener('DOMContentLoaded', () => {
     const episodesGrid = document.getElementById('episodes-grid');
     const statusMessage = document.getElementById('status-message');
-    const btnLatest = document.getElementById('btn-latest');
-    const btnSequence = document.getElementById('btn-sequence');
+
 
     let episodes = [];
-    let currentMode = 'latest'; // 'latest' or 'sequence'
+
 
     // Fetch episodes from backend
     async function fetchEpisodes() {
@@ -40,13 +39,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Sort based on mode
         let sortedEpisodes = [...episodes];
-        if (currentMode === 'sequence') {
-            // Ascending (Oldest first)
-            sortedEpisodes.sort((a, b) => new Date(a.published) - new Date(b.published));
-        } else {
-            // Descending (Newest first)
-            sortedEpisodes.sort((a, b) => new Date(b.published) - new Date(a.published));
-        }
+        // Descending (Newest first)
+        sortedEpisodes.sort((a, b) => new Date(b.published) - new Date(a.published));
 
         // Render each
         sortedEpisodes.forEach(ep => {
@@ -104,24 +98,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Event Listeners
-    btnLatest.addEventListener('click', () => {
-        if (currentMode !== 'latest') {
-            currentMode = 'latest';
-            btnLatest.classList.add('active');
-            btnSequence.classList.remove('active');
-            renderEpisodes();
-        }
-    });
-
-    btnSequence.addEventListener('click', () => {
-        if (currentMode !== 'sequence') {
-            currentMode = 'sequence';
-            btnSequence.classList.add('active');
-            btnLatest.classList.remove('active');
-            renderEpisodes();
-        }
-    });
 
     // Start fetch
     fetchEpisodes();
