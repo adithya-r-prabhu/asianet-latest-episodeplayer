@@ -84,7 +84,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const dateBadge = document.createElement('span');
             dateBadge.className = 'date-badge';
-            dateBadge.textContent = formatDate(ep.published);
+            dateBadge.textContent = 'Uploaded on ' + formatDate(ep.published);
 
             meta.appendChild(dateBadge);
 
